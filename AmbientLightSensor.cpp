@@ -1,0 +1,264 @@
+#include "AmbientLightSensor.h"
+#include "HidSensorSpec.h"
+
+static const uint8_t _hidSingleReportDescriptorAmbientLightSensor[] PROGMEM = {
+	HID_USAGE_PAGE_SENSOR,
+	HID_USAGE_SENSOR_TYPE_LIGHT_AMBIENTLIGHT,
+	HID_COLLECTION(Physical),
+
+	// HID_USAGE_SENSOR_DATA_LIGHT_ILLUMINANCE,
+	// HID_LOGICAL_MIN_8(0),
+	// HID_LOGICAL_MAX_16(0xFF,0xFF),
+	// HID_UNIT_EXPONENT(0x0F), // scale default unit to provide 1 digit past decimal point
+	// HID_REPORT_SIZE(16),
+	// HID_REPORT_COUNT(1),
+	// HID_INPUT(Data_Var_Abs),
+
+	//feature reports (xmit/receive)
+	HID_USAGE_PAGE_SENSOR,
+	HID_USAGE_SENSOR_PROPERTY_SENSOR_CONNECTION_TYPE, // NAry
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_8(2),
+	HID_REPORT_SIZE(8),
+	HID_REPORT_COUNT(1),
+	HID_COLLECTION(Logical),
+	HID_USAGE_SENSOR_PROPERTY_CONNECTION_TYPE_PC_INTEGRATED_SEL,
+	HID_USAGE_SENSOR_PROPERTY_CONNECTION_TYPE_PC_ATTACHED_SEL,
+	HID_USAGE_SENSOR_PROPERTY_CONNECTION_TYPE_PC_EXTERNAL_SEL,
+	HID_FEATURE(Data_Arr_Abs),
+	HID_END_COLLECTION,
+	HID_USAGE_SENSOR_PROPERTY_REPORTING_STATE,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_8(5),
+	HID_REPORT_SIZE(8),
+	HID_REPORT_COUNT(1),
+	HID_COLLECTION(Logical),
+	HID_USAGE_SENSOR_PROPERTY_REPORTING_STATE_NO_EVENTS_SEL,
+	HID_USAGE_SENSOR_PROPERTY_REPORTING_STATE_ALL_EVENTS_SEL,
+	HID_USAGE_SENSOR_PROPERTY_REPORTING_STATE_THRESHOLD_EVENTS_SEL,
+	HID_USAGE_SENSOR_PROPERTY_REPORTING_STATE_NO_EVENTS_WAKE_SEL,
+	HID_USAGE_SENSOR_PROPERTY_REPORTING_STATE_ALL_EVENTS_WAKE_SEL,
+	HID_USAGE_SENSOR_PROPERTY_REPORTING_STATE_THRESHOLD_EVENTS_WAKE_SEL,
+	HID_FEATURE(Data_Arr_Abs),
+	HID_END_COLLECTION,
+	HID_USAGE_SENSOR_PROPERTY_POWER_STATE,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_8(5),
+	HID_REPORT_SIZE(8),
+	HID_REPORT_COUNT(1),
+	HID_COLLECTION(Logical),
+	HID_USAGE_SENSOR_PROPERTY_POWER_STATE_UNDEFINED_SEL,
+	HID_USAGE_SENSOR_PROPERTY_POWER_STATE_D0_FULL_POWER_SEL,
+	HID_USAGE_SENSOR_PROPERTY_POWER_STATE_D1_LOW_POWER_SEL,
+	HID_USAGE_SENSOR_PROPERTY_POWER_STATE_D2_STANDBY_WITH_WAKE_SEL,
+	HID_USAGE_SENSOR_PROPERTY_POWER_STATE_D3_SLEEP_WITH_WAKE_SEL,
+	HID_USAGE_SENSOR_PROPERTY_POWER_STATE_D4_POWER_OFF_SEL,
+	HID_FEATURE(Data_Arr_Abs),
+	HID_END_COLLECTION,
+	HID_USAGE_SENSOR_STATE,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_8(6),
+	HID_REPORT_SIZE(8),
+	HID_REPORT_COUNT(1),
+	HID_COLLECTION(Logical),
+	HID_USAGE_SENSOR_STATE_UNKNOWN_SEL,
+	HID_USAGE_SENSOR_STATE_READY_SEL,
+	HID_USAGE_SENSOR_STATE_NOT_AVAILABLE_SEL,
+	HID_USAGE_SENSOR_STATE_NO_DATA_SEL,
+	HID_USAGE_SENSOR_STATE_INITIALIZING_SEL,
+	HID_USAGE_SENSOR_STATE_ACCESS_DENIED_SEL,
+	HID_USAGE_SENSOR_STATE_ERROR_SEL,
+	HID_FEATURE(Data_Arr_Abs),
+	HID_END_COLLECTION,
+	HID_USAGE_SENSOR_PROPERTY_REPORT_INTERVAL,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_32(0xFF, 0xFF, 0xFF, 0xFF),
+	HID_REPORT_SIZE(32),
+	HID_REPORT_COUNT(1),
+	HID_UNIT_EXPONENT(0),
+	HID_FEATURE(Data_Var_Abs),
+	HID_USAGE_SENSOR_DATA(HID_USAGE_SENSOR_DATA_LIGHT_ILLUMINANCE, HID_USAGE_SENSOR_DATA_MOD_CHANGE_SENSITIVITY_REL_PCT),
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_16(0x10, 0x27), // 10000 = 0.00 to 100.00 percent with 2 digits past decimal point
+	HID_REPORT_SIZE(16),
+	HID_REPORT_COUNT(1),
+	HID_UNIT_EXPONENT(0x0E), // scale default unit to provide 2 digits past decimal point
+	HID_FEATURE(Data_Var_Abs),
+	HID_USAGE_SENSOR_DATA(HID_USAGE_SENSOR_DATA_LIGHT_ILLUMINANCE, HID_USAGE_SENSOR_DATA_MOD_MAX),
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_16(0xFF, 0xFF),
+	HID_REPORT_SIZE(16),
+	HID_REPORT_COUNT(1),
+	HID_UNIT_EXPONENT(0x0F), // scale default unit to provide 1 digit past decimal point
+	HID_FEATURE(Data_Var_Abs),
+	HID_USAGE_SENSOR_DATA(HID_USAGE_SENSOR_DATA_LIGHT_ILLUMINANCE, HID_USAGE_SENSOR_DATA_MOD_MIN),
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_16(0xFF, 0xFF),
+	HID_REPORT_SIZE(16),
+	HID_REPORT_COUNT(1),
+	HID_UNIT_EXPONENT(0x0F), // scale default unit to provide 1 digit past decimal point
+	HID_FEATURE(Data_Var_Abs),
+
+	// //add this definition if required by the specific application
+	// HID_USAGE_SENSOR_PROPERTY_RESPONSE_CURVE,
+	// HID_LOGICAL_MIN_16(0x01, 0x80), //    LOGICAL_MINIMUM (-32767)
+	// HID_LOGICAL_MAX_16(0xFF, 0x7F), //    LOGICAL_MAXIMUM (32767)
+	// HID_REPORT_SIZE(16),
+	// HID_REPORT_COUNT(10),	//as required for n pair of values
+	// HID_UNIT_EXPONENT(0x0), // scale default unit to provide 0 digits past the decimal point
+	// HID_FEATURE(Data_Var_Abs),
+
+	//input reports (transmit)
+	HID_USAGE_PAGE_SENSOR,
+	HID_USAGE_SENSOR_STATE,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_8(6),
+	HID_REPORT_SIZE(8),
+	HID_REPORT_COUNT(1),
+	HID_COLLECTION(Logical),
+	HID_USAGE_SENSOR_STATE_UNKNOWN_SEL,
+	HID_USAGE_SENSOR_STATE_READY_SEL,
+	HID_USAGE_SENSOR_STATE_NOT_AVAILABLE_SEL,
+	HID_USAGE_SENSOR_STATE_NO_DATA_SEL,
+	HID_USAGE_SENSOR_STATE_INITIALIZING_SEL,
+	HID_USAGE_SENSOR_STATE_ACCESS_DENIED_SEL,
+	HID_USAGE_SENSOR_STATE_ERROR_SEL,
+	HID_INPUT(Data_Arr_Abs),
+	HID_END_COLLECTION,
+	HID_USAGE_SENSOR_EVENT,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_8(5),
+	HID_REPORT_SIZE(8),
+	HID_REPORT_COUNT(1),
+	HID_COLLECTION(Logical),
+	HID_USAGE_SENSOR_EVENT_UNKNOWN_SEL,
+	HID_USAGE_SENSOR_EVENT_STATE_CHANGED_SEL,
+	HID_USAGE_SENSOR_EVENT_PROPERTY_CHANGED_SEL,
+	HID_USAGE_SENSOR_EVENT_DATA_UPDATED_SEL,
+	HID_USAGE_SENSOR_EVENT_POLL_RESPONSE_SEL,
+	HID_USAGE_SENSOR_EVENT_CHANGE_SENSITIVITY_SEL,
+	HID_INPUT(Data_Arr_Abs),
+	HID_END_COLLECTION,
+	HID_USAGE_SENSOR_DATA_LIGHT_ILLUMINANCE,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_16(0xFF, 0xFF),
+	HID_UNIT_EXPONENT(0x0F), // scale default unit to provide 1 digit past decimal point
+	HID_REPORT_SIZE(16),
+	HID_REPORT_COUNT(1),
+	HID_INPUT(Data_Var_Abs),
+	HID_USAGE_SENSOR_DATA_LIGHT_COLOR_TEMPERATURE,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_16(0xFF, 0xFF),
+	HID_UNIT_EXPONENT(0),
+	HID_REPORT_SIZE(16),
+	HID_REPORT_COUNT(1),
+	HID_INPUT(Data_Var_Abs),
+	HID_USAGE_SENSOR_DATA_LIGHT_CHROMATICITY_X,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_16(0xFF, 0xFF),
+	HID_UNIT_EXPONENT(0x0C), // scale default unit to provide 4 digits past decimal point
+	HID_REPORT_SIZE(16),
+	HID_REPORT_COUNT(1),
+	HID_INPUT(Data_Var_Abs),
+	HID_USAGE_SENSOR_DATA_LIGHT_CHROMATICITY_Y,
+	HID_LOGICAL_MIN_8(0),
+	HID_LOGICAL_MAX_16(0xFF, 0xFF),
+	HID_UNIT_EXPONENT(0x0C), // scale default unit to provide 4 digits past decimal point
+	HID_REPORT_SIZE(16),
+	HID_REPORT_COUNT(1),
+	HID_INPUT(Data_Var_Abs),
+
+	/* End */
+	HID_END_COLLECTION};
+
+AmbientLightSensor_::AmbientLightSensor_(void) : PluggableUSBModule(1, 1, epType), protocol(HID_REPORT_PROTOCOL), idle(1)
+{
+	epType[0] = EP_TYPE_INTERRUPT_IN;
+	PluggableUSB().plug(this);
+}
+
+int AmbientLightSensor_::getInterface(uint8_t *interfaceCount)
+{
+	*interfaceCount += 1; // uses 1
+	HIDDescriptor hidInterface = {
+		D_INTERFACE(pluggedInterface, 1, USB_DEVICE_CLASS_HUMAN_INTERFACE, HID_SUBCLASS_NONE, HID_PROTOCOL_NONE),
+		D_HIDREPORT(sizeof(_hidSingleReportDescriptorAmbientLightSensor)),
+		D_ENDPOINT(USB_ENDPOINT_IN(pluggedEndpoint), USB_ENDPOINT_TYPE_INTERRUPT, USB_EP_SIZE, 0x01)};
+	return USB_SendControl(0, &hidInterface, sizeof(hidInterface));
+}
+
+int AmbientLightSensor_::getDescriptor(USBSetup &setup)
+{
+	// Check if this is a HID Class Descriptor request
+	if (setup.bmRequestType != REQUEST_DEVICETOHOST_STANDARD_INTERFACE)
+	{
+		return 0;
+	}
+	if (setup.wValueH != HID_REPORT_DESCRIPTOR_TYPE)
+	{
+		return 0;
+	}
+
+	// In a HID Class Descriptor wIndex cointains the interface number
+	if (setup.wIndex != pluggedInterface)
+	{
+		return 0;
+	}
+
+	// Reset the protocol on reenumeration. Normally the host should not assume the state of the protocol
+	// due to the USB specs, but Windows and Linux just assumes its in report mode.
+	protocol = HID_REPORT_PROTOCOL;
+
+	return USB_SendControl(TRANSFER_PGM, _hidSingleReportDescriptorAmbientLightSensor, sizeof(_hidSingleReportDescriptorAmbientLightSensor));
+}
+
+bool AmbientLightSensor_::setup(USBSetup &setup)
+{
+	if (pluggedInterface != setup.wIndex)
+	{
+		return false;
+	}
+
+	uint8_t request = setup.bRequest;
+	uint8_t requestType = setup.bmRequestType;
+
+	if (requestType == REQUEST_DEVICETOHOST_CLASS_INTERFACE)
+	{
+		if (request == HID_GET_REPORT)
+		{
+			// TODO: HID_GetReport();
+			return true;
+		}
+		if (request == HID_GET_PROTOCOL)
+		{
+			// TODO: Send8(protocol);
+			return true;
+		}
+	}
+
+	if (requestType == REQUEST_HOSTTODEVICE_CLASS_INTERFACE)
+	{
+		if (request == HID_SET_PROTOCOL)
+		{
+			protocol = setup.wValueL;
+			return true;
+		}
+		if (request == HID_SET_IDLE)
+		{
+			idle = setup.wValueL;
+			return true;
+		}
+		if (request == HID_SET_REPORT)
+		{
+		}
+	}
+
+	return false;
+}
+
+void AmbientLightSensor_::SendReport(void *data, int length)
+{
+	USB_Send(pluggedEndpoint | TRANSFER_RELEASE, data, length);
+}
+
+AmbientLightSensor_ AmbientLightSensor;
