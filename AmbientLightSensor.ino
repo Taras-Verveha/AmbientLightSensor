@@ -15,7 +15,7 @@ void loop() {
   // read the analog in value:
   sensorValue = analogRead(analogInPin);
   // map it to the range of the analog out:
-  outputValue = map(sensorValue, 0, 1023, 0, 100);
+  outputValue = map(sensorValue, 0, 1023, 0, 10000);
 
   if (outputValue != lastValue) {
     // print the results to the Serial Monitor:
@@ -24,7 +24,7 @@ void loop() {
     Serial.print("\t output = ");
     Serial.println(outputValue);
   
-    AmbientLightSensor.send(outputValue);
+    AmbientLightSensor.report(outputValue);
     lastValue = outputValue;
   }
 
@@ -32,5 +32,5 @@ void loop() {
 
   // wait 100 milliseconds before the next loop for the analog-to-digital
   // converter to settle after the last reading:
-  delay(100);
+  delay(1000);
 }

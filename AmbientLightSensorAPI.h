@@ -8,7 +8,7 @@
 typedef struct _ALS_FEATURE_REPORT
 {
 	//common properties
-	HID_UCHAR ucReportId;
+	//HID_UCHAR ucReportId;
 	HID_UCHAR ucConnectionType;
 	HID_UCHAR ucReportingState;
 	HID_UCHAR ucPowerState;
@@ -20,15 +20,15 @@ typedef struct _ALS_FEATURE_REPORT
 	HID_USHORT usIlluminanceMaximum;
 	HID_USHORT usIlluminanceMinimum;
 
-	//add this definition if required by the specific application
-	HID_USHORT usResponseCurve[5][2]; //10 elements matches descriptor
+	// //add this definition if required by the specific application
+	// HID_USHORT usResponseCurve[5][2]; //10 elements matches descriptor
 
 } ALS_FEATURE_REPORT, *PALS_FEATURE_REPORT;
 
 typedef struct _ALS_INPUT_REPORT
 {
 	//common values
-	HID_UCHAR ucReportId;
+	//HID_UCHAR ucReportId;
 	HID_UCHAR ucSensorState;
 	HID_UCHAR ucEventType;
 
@@ -46,9 +46,11 @@ public:
 	inline AmbientLightSensorAPI(void);
 	inline void begin(void);
 	inline void end(void);
-	inline void send(int value);
+
+	inline void report(int value);
+
 	// Sending is public in the base class for advanced users.
-	virtual void SendReport(void *data, int length) = 0;
+	virtual void SendReport(void* data, int length) = 0;
 };
 
 // Implementation is inline

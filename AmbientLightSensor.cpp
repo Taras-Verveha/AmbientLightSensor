@@ -1,19 +1,14 @@
 #include "AmbientLightSensor.h"
 #include "HidSensorSpec.h"
 
-static const uint8_t _hidSingleReportDescriptorAmbientLightSensor[] PROGMEM = {
+static const uint8_t _hidMultiReportDescriptorAmbientLightSensor[] PROGMEM = {
+HID_USAGE_PAGE_SENSOR,
+HID_USAGE_SENSOR_TYPE_LIGHT_AMBIENTLIGHT,
+HID_COLLECTION(Application),
+    HID_REPORT_ID(HID_REPORTID_AMBIENTLIGHT),
 	HID_USAGE_PAGE_SENSOR,
 	HID_USAGE_SENSOR_TYPE_LIGHT_AMBIENTLIGHT,
 	HID_COLLECTION(Physical),
-
-	// HID_USAGE_SENSOR_DATA_LIGHT_ILLUMINANCE,
-	// HID_LOGICAL_MIN_8(0),
-	// HID_LOGICAL_MAX_16(0xFF,0xFF),
-	// HID_UNIT_EXPONENT(0x0F), // scale default unit to provide 1 digit past decimal point
-	// HID_REPORT_SIZE(16),
-	// HID_REPORT_COUNT(1),
-	// HID_INPUT(Data_Var_Abs),
-
 	//feature reports (xmit/receive)
 	HID_USAGE_PAGE_SENSOR,
 	HID_USAGE_SENSOR_PROPERTY_SENSOR_CONNECTION_TYPE, // NAry
@@ -169,96 +164,19 @@ static const uint8_t _hidSingleReportDescriptorAmbientLightSensor[] PROGMEM = {
 	HID_INPUT(Data_Var_Abs),
 
 	/* End */
-	HID_END_COLLECTION};
+	HID_END_COLLECTION,
+HID_END_COLLECTION};
 
-AmbientLightSensor_::AmbientLightSensor_(void) : PluggableUSBModule(1, 1, epType), protocol(HID_REPORT_PROTOCOL), idle(1)
+AmbientLightSensor_::AmbientLightSensor_(void) 
 {
-	epType[0] = EP_TYPE_INTERRUPT_IN;
-	PluggableUSB().plug(this);
+	static HIDSubDescriptor node(_hidMultiReportDescriptorAmbientLightSensor, sizeof(_hidMultiReportDescriptorAmbientLightSensor));
+	HID().AppendDescriptor(&node);
 }
 
-int AmbientLightSensor_::getInterface(uint8_t *interfaceCount)
+
+void AmbientLightSensor_::SendReport(void* data, int length)
 {
-	*interfaceCount += 1; // uses 1
-	HIDDescriptor hidInterface = {
-		D_INTERFACE(pluggedInterface, 1, USB_DEVICE_CLASS_HUMAN_INTERFACE, HID_SUBCLASS_NONE, HID_PROTOCOL_NONE),
-		D_HIDREPORT(sizeof(_hidSingleReportDescriptorAmbientLightSensor)),
-		D_ENDPOINT(USB_ENDPOINT_IN(pluggedEndpoint), USB_ENDPOINT_TYPE_INTERRUPT, USB_EP_SIZE, 0x01)};
-	return USB_SendControl(0, &hidInterface, sizeof(hidInterface));
-}
-
-int AmbientLightSensor_::getDescriptor(USBSetup &setup)
-{
-	// Check if this is a HID Class Descriptor request
-	if (setup.bmRequestType != REQUEST_DEVICETOHOST_STANDARD_INTERFACE)
-	{
-		return 0;
-	}
-	if (setup.wValueH != HID_REPORT_DESCRIPTOR_TYPE)
-	{
-		return 0;
-	}
-
-	// In a HID Class Descriptor wIndex cointains the interface number
-	if (setup.wIndex != pluggedInterface)
-	{
-		return 0;
-	}
-
-	// Reset the protocol on reenumeration. Normally the host should not assume the state of the protocol
-	// due to the USB specs, but Windows and Linux just assumes its in report mode.
-	protocol = HID_REPORT_PROTOCOL;
-
-	return USB_SendControl(TRANSFER_PGM, _hidSingleReportDescriptorAmbientLightSensor, sizeof(_hidSingleReportDescriptorAmbientLightSensor));
-}
-
-bool AmbientLightSensor_::setup(USBSetup &setup)
-{
-	if (pluggedInterface != setup.wIndex)
-	{
-		return false;
-	}
-
-	uint8_t request = setup.bRequest;
-	uint8_t requestType = setup.bmRequestType;
-
-	if (requestType == REQUEST_DEVICETOHOST_CLASS_INTERFACE)
-	{
-		if (request == HID_GET_REPORT)
-		{
-			// TODO: HID_GetReport();
-			return true;
-		}
-		if (request == HID_GET_PROTOCOL)
-		{
-			// TODO: Send8(protocol);
-			return true;
-		}
-	}
-
-	if (requestType == REQUEST_HOSTTODEVICE_CLASS_INTERFACE)
-	{
-		if (request == HID_SET_PROTOCOL)
-		{
-			protocol = setup.wValueL;
-			return true;
-		}
-		if (request == HID_SET_IDLE)
-		{
-			idle = setup.wValueL;
-			return true;
-		}
-		if (request == HID_SET_REPORT)
-		{
-		}
-	}
-
-	return false;
-}
-
-void AmbientLightSensor_::SendReport(void *data, int length)
-{
-	USB_Send(pluggedEndpoint | TRANSFER_RELEASE, data, length);
+	HID().SendReport(HID_REPORTID_AMBIENTLIGHT, data, length);
 }
 
 AmbientLightSensor_ AmbientLightSensor;

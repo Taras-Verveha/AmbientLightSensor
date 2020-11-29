@@ -3,25 +3,18 @@
 
 #include "HidSensorSpec.h"
 
-AmbientLightSensorAPI::AmbientLightSensorAPI(void)
-{
-	// Empty
+AmbientLightSensorAPI::AmbientLightSensorAPI(void){
 }
 
-void AmbientLightSensorAPI::begin(void)
-{
-	end();
+void AmbientLightSensorAPI::begin(void){
 }
 
-void AmbientLightSensorAPI::end(void)
-{
-	send(0);
+void AmbientLightSensorAPI::end(void){
 }
 
-void AmbientLightSensorAPI::send(int value)
-{
+void AmbientLightSensorAPI::report(int value){
 	ALS_INPUT_REPORT report;
-	report.ucReportId = 0;
+	//report.ucReportId = HID_REPORTID_AMBIENTLIGHT_DATA;
 	report.ucSensorState = HID_USAGE_SENSOR_STATE_READY_SEL_ENUM;
 	report.ucEventType = HID_USAGE_SENSOR_EVENT_DATA_UPDATED_SEL_ENUM;
 	report.usIlluminanceValue = value;

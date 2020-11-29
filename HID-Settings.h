@@ -73,6 +73,10 @@ THE SOFTWARE.
 #define HID_REPORTID_SURFACEDIAL 10
 #endif
 
+#ifndef HID_REPORTID_AMBIENTLIGHT
+#define HID_REPORTID_AMBIENTLIGHT 11
+#endif
+
 #if defined(ARDUINO_ARCH_AVR)
 
 #include "PluggableUSB.h"
